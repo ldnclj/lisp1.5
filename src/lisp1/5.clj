@@ -29,6 +29,7 @@
        (not (fn? e))))
 
 (declare eval-lisp)
+(declare apply-lisp)
 
 ;; Similar to clojure cond
 (defn evcon
@@ -37,6 +38,13 @@
     (evcon (rest c) a)
     (eval-lisp (first (rest (first c))) a)))
 
+
+(defn evlis
+  [m a]
+  (if (empty? m) nil
+      (cons (eval-lisp (first m) a) (evlis (rest m) a))))
+
+;; similar to eval
 (defn eval-lisp
   [e a]
   (cond
@@ -44,10 +52,17 @@
     (atom-lisp (first e)) (cond
                             (= (first e) :quote) (second e)
                             (= (first e) :cond) (evcon (rest e) a)
-                            ;:else (apply-lisp (firs))
-                            )
-    ))
+                            :else (apply-lisp (first e) (evlis (rest e) a) a))
+    :else (apply-lisp (first e) (evlis (rest e) a) a)))
 
+(defn apply-lisp
+  ;; f is function
+  ;; x is args
+  ;; a is environment
+  [f x a]
+  (cond
+    (atom-lisp f) (cond (= f :car) (ffirst x)))
+  )
 
 (def var-env [[:a [:m :n]] [:b '(car x)] [:n :nil] [:c '(quote m)] [:c '(rest x)]])
 
@@ -55,6 +70,10 @@
 (eval-lisp [:quote :b] var-env)
 (evcon [[:n :c] [:b :a]] var-env)
 (eval-lisp [:cond [:n :c] [:b :a]] var-env)
+(eval-lisp [:car :a] var-env)
+
+
+
 
 (defn -main
   "I don't do a whole lot ... yet."
