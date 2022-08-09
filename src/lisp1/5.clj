@@ -63,7 +63,10 @@
   (cond
     (atom-lisp f) (cond
                     (= f :car) (ffirst x)
-                    (= f :cdr) (rest (first x)))))
+                    (= f :cdr) (rest (first x))
+                    (= f :cons) [(first x) (first (rest x))]
+                    (= f :atom) (atom-lisp (first x))
+                    (= f :eq) (= (first x) (second x)))))
 
 (def var-env [[:a [:m :n]]
               [:b '(car x)]
@@ -79,7 +82,11 @@
 (eval-lisp :a var-env)
 (eval-lisp [:car :a] var-env)
 (eval-lisp [:cdr :a] var-env)
-
+(eval-lisp [:cons [:quote 4] [:quote [8]]] var-env)
+(eval-lisp [:atom [:cons [:quote 4] [:quote [8]]]] var-env)
+(eval-lisp [:atom [:quote 4]] var-env)
+(eval-lisp [:eq [:quote 4] [:quote 4]] var-env)
+(eval-lisp [:eq [:quote 4] [:quote 7]] var-env)
 
 
 
