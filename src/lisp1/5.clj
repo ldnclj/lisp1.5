@@ -61,16 +61,24 @@
   ;; a is environment
   [f x a]
   (cond
-    (atom-lisp f) (cond (= f :car) (ffirst x)))
-  )
+    (atom-lisp f) (cond
+                    (= f :car) (ffirst x)
+                    (= f :cdr) (rest (first x)))))
 
-(def var-env [[:a [:m :n]] [:b '(car x)] [:n :nil] [:c '(quote m)] [:c '(rest x)]])
+(def var-env [[:a [:m :n]]
+              [:b '(car x)]
+              [:n :nil]
+              [:c '(quote m)]
+              [:c '(rest x)]])
 
 (eval-lisp :b var-env)
 (eval-lisp [:quote :b] var-env)
 (evcon [[:n :c] [:b :a]] var-env)
 (eval-lisp [:cond [:n :c] [:b :a]] var-env)
+
+(eval-lisp :a var-env)
 (eval-lisp [:car :a] var-env)
+(eval-lisp [:cdr :a] var-env)
 
 
 
