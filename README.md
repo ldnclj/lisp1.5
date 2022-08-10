@@ -2,6 +2,8 @@
 
 This is the result of an attempt at the implementation of the core of lisp 1.5 during the one of the London Clojure Dojos, using clojure as a base.
 
+Note that for speed, we used clojure keywords to represent symbols and avoid collisions with the clojure namespace. Future exercise could be to work with a parsed string instead. 
+
 
 ## License
 
