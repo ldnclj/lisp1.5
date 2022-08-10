@@ -11,18 +11,19 @@
     a
     (cons [(first x) (first y)] (pairlis (rest x) (rest y) a))))
 
-
-(pairlis [:a :b :c] [:u :v :w] [[:d :x] [:e :y]])
+;(pairlis [:a :b :c] [:u :v :w] [[:d :x] [:e :y]])
 ;; => ([:a :u] [:b :v] [:c :w] [:d :x] [:e :y])
 
-
-;; Equivalent to a get
+;; Equivalent to a clojure get
 (defn assoc-lisp [x a]
   (if (= x (ffirst a))
     (first a)
     (assoc-lisp x (rest a))))
 
-(assoc-lisp :b [[:a [:m :n]] [:b '(car x)] [:c '(quote m)] [:c '(rest x)]])
+(assoc-lisp :b [[:a [:m :n]]
+                [:b '(car x)]
+                [:c '(quote m)]
+                [:c '(rest x)]])
 
 (defn atom-lisp [e]
   (and (not (coll? e))
@@ -39,6 +40,7 @@
     (eval-lisp (first (rest (first c))) a)))
 
 
+;; evaluate a list
 (defn evlis
   [m a]
   (if (empty? m) nil
@@ -58,7 +60,7 @@
 (defn apply-lisp
   ;; f is function
   ;; x is args
-  ;; a is environment
+  ;; a is var environment
   [f x a]
   (cond
     (atom-lisp f) (cond
@@ -69,7 +71,12 @@
                     (= f :eq) (= (first x) (second x)))
     (= (first f) :lambda) (eval-lisp (first (rest (rest f)))
                                      (pairlis (second f) x a))
-    #_(= (first f) :label)))
+    (= (first f) :label) (apply-lisp (first (rest (rest f)))
+                                     x
+                                     (cons (cons (second f)
+                                                 (nth f 3)
+                                                 )
+                                           a))))
 
 (def var-env [[:a [:m :n]]
               [:b '(car x)]
@@ -92,9 +99,16 @@
 (eval-lisp [:eq [:quote 4] [:quote 7]] var-env)
 (eval-lisp [[:lambda [:x :y] [:cons :y :x]] :a :b] var-env)
 
-
+;; Labels not working yet.
+(eval-lisp [[:label :my-f [:x :y] [:cons :y :x]]
+            [:my-f :a :b]] var-env)
 
 (defn -main
-  "I don't do a whole lot ... yet."
   [& args]
-  (println "Hello, World!"))
+  (let [program [[:lambda [:x :y] [:cons :y :x]] :a :b]
+        var-env [[:a [:m :n]]
+                 [:b '(car x)]
+                 [:n :nil]
+                 [:c '(quote m)]
+                 [:c '(rest x)]]]
+    (println "Eval\n" program "\nin environment\n" var-env "\n=>\n" (eval-lisp program var-env))))
