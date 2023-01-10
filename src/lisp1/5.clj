@@ -121,11 +121,14 @@
 
 (eval-lisp (read-string "[cons 5 8]") [])
 (eval-lisp (read-string "[car [quote [5 8]]]") [])
-(eval-lisp (read-string "[cons [:quote 4] [:quote [8]]]") [])
-(eval-lisp (read-string "[cons [:quote 4] [:quote 8]]") [])
+(eval-lisp (read-string "[cons [quote 4] [:quote [8]]]") [])
+(eval-lisp (read-string "[cons [quote 4] [:quote 8]]") [])
 (eval-lisp (read-string "[[lambda [:x :y] [cons :y :x]] :a :b]")
            [[:a 5] [:b 6]])
 
 (eval-lisp (read-string "[+ 5 b]") [['b 6]])
+
+
+
 (eval-lisp (read-string "[label :f [lambda [:x :y] [cons :y :x]] :a :b]")
            [[:a 5] [:b 6]])
