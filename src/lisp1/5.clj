@@ -68,6 +68,7 @@
   [f x a]
   (cond
     (atom-lisp f) (cond
+                    (= (symbol f) '+) (apply + (evlis x a)) ;; not core
                     (= (symbol f) 'car) (ffirst x)
                     (= (symbol f) 'cdr) (rest (first x))
                     (= (symbol f) 'cons) [(first x) (first (rest x))]
@@ -118,10 +119,13 @@
                  [:c '(rest x)]]]
     (println "Eval\n" program "\nin environment\n" var-env "\n=>\n" (eval-lisp program var-env))))
 
-
 (eval-lisp (read-string "[cons 5 8]") [])
 (eval-lisp (read-string "[car [quote [5 8]]]") [])
-(eval-lisp (read-string "[:cons [:quote 4] [:quote [8]]]") [])
-(eval-lisp (read-string "[:cons [:quote 4] [:quote 8]]") [])
+(eval-lisp (read-string "[cons [:quote 4] [:quote [8]]]") [])
+(eval-lisp (read-string "[cons [:quote 4] [:quote 8]]") [])
 (eval-lisp (read-string "[[lambda [:x :y] [cons :y :x]] :a :b]")
+           [[:a 5] [:b 6]])
+
+(eval-lisp (read-string "[+ 5 b]") [['b 6]])
+(eval-lisp (read-string "[label :f [lambda [:x :y] [cons :y :x]] :a :b]")
            [[:a 5] [:b 6]])
