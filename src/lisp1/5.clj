@@ -18,6 +18,7 @@
 
 ;; Equivalent to a clojure get
 (defn assoc-lisp [x a]
+  (assert (not-empty a))
   (if (= x (ffirst a))
     (first a)
     (assoc-lisp x (rest a))))
@@ -52,6 +53,7 @@
 (defn eval-lisp
   [e a]
   (cond
+    (number? e) e
     (atom-lisp e) (second (assoc-lisp e a))
     (atom-lisp (first e)) (cond
                             (= (first e) :quote) (second e)
@@ -96,6 +98,7 @@
 (eval-lisp [:car :a] var-env)
 (eval-lisp [:cdr :a] var-env)
 (eval-lisp [:cons [:quote 4] [:quote [8]]] var-env)
+(eval-lisp [:cons [:quote 4] [:quote [8]]] [])
 (eval-lisp [:atom [:cons [:quote 4] [:quote [8]]]] var-env)
 (eval-lisp [:atom [:quote 4]] var-env)
 (eval-lisp [:eq [:quote 4] [:quote 4]] var-env)
@@ -115,3 +118,8 @@
                  [:c '(quote m)]
                  [:c '(rest x)]]]
     (println "Eval\n" program "\nin environment\n" var-env "\n=>\n" (eval-lisp program var-env))))
+
+
+(eval-lisp (read-string "[:cons 5 8]") [])
+(eval-lisp (read-string "[:cons [:quote 4] [:quote [8]]]") [])
+(eval-lisp (read-string "[:cons [:quote 4] [:quote 8]]") [])
