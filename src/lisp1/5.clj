@@ -6,12 +6,14 @@
 
 ;; Equivalent to clojure assoc
 (defn pairlis
+  "Binds the pairs formed by x and y elements into the environment a"
   [x y a]
   (if (empty? x)
     a
     (cons [(first x) (first y)] (pairlis (rest x) (rest y) a))))
 
-;(pairlis [:a :b :c] [:u :v :w] [[:d :x] [:e :y]])
+;;(pairlis [:a :b :c] [:u :v :w]
+;;         [[:d :x] [:e :y]])
 ;; => ([:a :u] [:b :v] [:c :w] [:d :x] [:e :y])
 
 ;; Equivalent to a clojure get
@@ -86,6 +88,7 @@
 
 (eval-lisp :b var-env)
 (eval-lisp [:quote :b] var-env)
+
 (evcon [[:n :c] [:b :a]] var-env)
 (eval-lisp [:cond [:n :c] [:b :a]] var-env)
 
