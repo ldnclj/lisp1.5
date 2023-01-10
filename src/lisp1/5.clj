@@ -56,8 +56,8 @@
     (number? e) e
     (atom-lisp e) (second (assoc-lisp e a))
     (atom-lisp (first e)) (cond
-                            (= (first e) :quote) (second e)
-                            (= (first e) :cond) (evcon (rest e) a)
+                            (= (symbol (first e)) 'quote) (second e)
+                            (= (symbol (first e)) 'cond) (evcon (rest e) a)
                             :else (apply-lisp (first e) (evlis (rest e) a) a))
     :else (apply-lisp (first e) (evlis (rest e) a) a)))
 
@@ -68,19 +68,18 @@
   [f x a]
   (cond
     (atom-lisp f) (cond
-                    (= f :car) (ffirst x)
-                    (= f :cdr) (rest (first x))
-                    (= f :cons) [(first x) (first (rest x))]
-                    (= f :atom) (atom-lisp (first x))
-                    (= f :eq) (= (first x) (second x)))
-    (= (first f) :lambda) (eval-lisp (first (rest (rest f)))
-                                     (pairlis (second f) x a))
-    (= (first f) :label) (apply-lisp (first (rest (rest f)))
-                                     x
-                                     (cons (cons (second f)
-                                                 (nth f 3)
-                                                 )
-                                           a))))
+                    (= (symbol f) 'car) (ffirst x)
+                    (= (symbol f) 'cdr) (rest (first x))
+                    (= (symbol f) 'cons) [(first x) (first (rest x))]
+                    (= (symbol f) 'atom) (atom-lisp (first x))
+                    (= (symbol f) 'eq) (= (first x) (second x)))
+    (= (symbol (first f)) 'lambda) (eval-lisp (first (rest (rest f)))
+                                              (pairlis (second f) x a))
+    (= (symbol (first f)) 'label) (apply-lisp (first (rest (rest f)))
+                                              x
+                                              (cons (cons (second f)
+                                                          (nth f 3))
+                                                    a))))
 
 (def var-env [[:a [:m :n]]
               [:b '(car x)]
@@ -120,6 +119,9 @@
     (println "Eval\n" program "\nin environment\n" var-env "\n=>\n" (eval-lisp program var-env))))
 
 
-(eval-lisp (read-string "[:cons 5 8]") [])
+(eval-lisp (read-string "[cons 5 8]") [])
+(eval-lisp (read-string "[car [quote [5 8]]]") [])
 (eval-lisp (read-string "[:cons [:quote 4] [:quote [8]]]") [])
 (eval-lisp (read-string "[:cons [:quote 4] [:quote 8]]") [])
+(eval-lisp (read-string "[[lambda [:x :y] [cons :y :x]] :a :b]")
+           [[:a 5] [:b 6]])
